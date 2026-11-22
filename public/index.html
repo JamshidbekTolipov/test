@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Onlayn Test Platformasi</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --card: #111827;
+      --card-2: #1e293b;
+      --border: #273549;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --red: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at top, #172554 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+
+    .container { width: 100%; max-width: 740px; }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .brand { font-size: 20px; font-weight: 700; color: #60a5fa; }
+
+    .admin-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: 0.2s;
+    }
+    .admin-link:hover { color: var(--text); border-color: var(--accent); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    .center-box { max-width: 440px; margin: 40px auto; text-align: center; }
+
+    h1 { font-size: 26px; margin-bottom: 10px; }
+    p.sub { color: var(--muted); font-size: 15px; margin-bottom: 24px; line-height: 1.5; }
+
+    .input-group { margin-bottom: 16px; text-align: left; }
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 16px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    #codeInput {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 8px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px 20px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      margin-top: 12px;
+    }
+    .btn-secondary:hover { background: #273549; }
+
+    .error {
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .hidden { display: none !important; }
+
+    /* Yopishqoq (sticky) taymer paneli */
+    .timer-bar {
+      position: sticky;
+      top: 12px;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(17, 24, 39, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .timer-value {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 22px;
+      font-weight: 800;
+      color: #60a5fa;
+      letter-spacing: 1px;
+    }
+
+    .timer-bar.warning { border-color: var(--amber); }
+    .timer-bar.warning .timer-value { color: #fbbf24; }
+
+    .timer-bar.danger { border-color: var(--red); animation: pulse 1s infinite; }
+    .timer-bar.danger .timer-value { color: #f87171; }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.35); }
+      50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+    }
+
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .badge {
+      background: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    .question-block {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .question-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 10px; }
+
+    .option-btn {
+      text-align: left;
+      padding: 12px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: 0.15s;
+    }
+
+    .option-btn:hover { border-color: #60a5fa; }
+    .option-btn.selected {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: var(--accent);
+    }
+
+    .opt-letter {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: var(--card-2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .option-btn.selected .opt-letter { background: var(--accent); color: #fff; }
+
+    .score-box {
+      text-align: center;
+      padding: 16px 10px 26px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .score-big {
+      font-size: 48px;
+      font-weight: 800;
+      color: #60a5fa;
+      margin: 8px 0;
+    }
+
+    .timeout-note {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      background: rgba(245, 158, 11, 0.16);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .review-opt {
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 8px;
+      font-size: 14px;
+      border: 1px solid var(--border);
+      background: var(--card);
+    }
+
+    .review-opt.correct {
+      border-color: var(--green);
+      background: rgba(16, 185, 129, 0.15);
+      color: #a7f3d0;
+    }
+
+    .review-opt.wrong {
+      border-color: var(--red);
+      background: rgba(239, 68, 68, 0.15);
+      color: #fecaca;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div class="brand">TestPortal</div>
+      <a href="/admin" class="admin-link">Admin panel</a>
+    </div>
+
+    <!-- 1. KOD KIRITISH -->
+    <div id="entryScreen" class="card center-box">
+      <h1>Testga kirish</h1>
+      <p class="sub">O‘qituvchi bergan 6 xonali test kodini va ismingizni kiriting.</p>
+
+      <div id="entryError" class="error"></div>
+
+      <div class="input-group">
+        <label for="codeInput">6 xonali test kodi</label>
+        <input
+          type="text"
+          id="codeInput"
+          inputmode="numeric"
+          maxlength="6"
+          placeholder="000000"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="input-group">
+        <label for="nameInput">Ism va familiyangiz</label>
+        <input type="text" id="nameInput" placeholder="Masalan: Ali Valiyev" />
+      </div>
+
+      <button class="btn" id="startBtn">Testni boshlash</button>
+    </div>
+
+    <!-- TAYMER PANELI -->
+    <div id="timerBar" class="timer-bar hidden">
+      <div>
+        <div style="font-size: 12px; color: var(--muted);">Qolgan vaqt</div>
+        <div id="answeredProgress" style="font-size: 13px; color: var(--text); margin-top: 2px;">0 / 0 belgilandi</div>
+      </div>
+      <div class="timer-value" id="timerDisplay">00:00</div>
+    </div>
+
+    <!-- 2. TEST ISHLASH -->
+    <div id="quizScreen" class="card hidden">
+      <div class="quiz-header">
+        <div>
+          <h2 id="quizTitle">Test nomi</h2>
+          <div style="color: var(--muted); font-size: 13px; margin-top: 4px;" id="quizStudent"></div>
+        </div>
+        <div class="badges" id="quizBadges"></div>
+      </div>
+
+      <div id="questionsContainer"></div>
+
+      <div id="quizError" class="error"></div>
+      <button class="btn" id="submitBtn">Testni yakunlash</button>
+    </div>
+
+    <!-- 3. NATIJA -->
+    <div id="resultScreen" class="card hidden">
+      <div class="score-box">
+        <div style="color: var(--muted); font-size: 14px;">Sizning natijangiz</div>
+        <div class="score-big" id="scorePercent">0%</div>
+        <div id="scoreText" style="font-size: 18px; font-weight: 600;"></div>
+        <div id="timeSpentText" style="color: var(--muted); font-size: 14px; margin-top: 6px;"></div>
+        <div id="timeoutBadge" class="timeout-note hidden">Vaqt tugagani sababli test avtomatik yakunlandi</div>
+      </div>
+
+      <div id="reviewContainer"></div>
+
+      <button class="btn btn-secondary" onclick="location.href='/'">Boshqa testga kirish</button>
+    </div>
+  </div>
+
+  <script>
+    const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+    let currentTest = null;
+    // Har bir ko'rsatilgan savol uchun { qIndex, selectedOIndex, optionOrder }
+    let answerState = [];
+    let timerInterval = null;
+    let remainingSec = 0;
+    let startedAtMs = 0;
+    let isSubmitting = false;
+
+    const codeInput = document.getElementById('codeInput');
+    const nameInput = document.getElementById('nameInput');
+    const entryError = document.getElementById('entryError');
+    const quizError = document.getElementById('quizError');
+
+    const urlCode = new URLSearchParams(window.location.search).get('code');
+    if (urlCode && /^\d{6}$/.test(urlCode)) {
+      codeInput.value = urlCode;
+    }
+
+    codeInput.addEventListener('input', () => {
+      codeInput.value = codeInput.value.replace(/\D/g, '').slice(0, 6);
+    });
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatTime(totalSec) {
+      const sec = Math.max(0, Math.floor(totalSec));
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      const pad = (n) => String(n).padStart(2, '0');
+      return h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+    }
+
+    function showError(el, msg) {
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function hideError(el) {
+      el.style.display = 'none';
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startTest);
+    codeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startTest(); });
+    nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startTest(); });
+
+    async function startTest() {
+      hideError(entryError);
+      const code = codeInput.value.trim();
+      const studentName = nameInput.value.trim();
+
+      if (!/^\d{6}$/.test(code)) {
+        return showError(entryError, 'Iltimos, 6 xonali test kodini to‘liq kiriting.');
+      }
+      if (studentName.length < 2) {
+        return showError(entryError, 'Iltimos, ism va familiyangizni kiriting.');
+      }
+
+      const btn = document.getElementById('startBtn');
+      btn.disabled = true;
+      btn.textContent = 'Yuklanmoqda...';
+
+      try {
+        const res = await fetch(`/api/tests/${code}`);
+        const data = await res.json();
+        if (!res.ok) {
+          showError(entryError, data.error || 'Test topilmadi');
+          return;
+        }
+
+        currentTest = data;
+        answerState = data.questions.map((q) => ({
+          qIndex: q.qIndex,
+          selectedOIndex: -1,
+          optionOrder: q.options.map((o) => o.oIndex)
+        }));
+        startedAtMs = Date.now();
+        isSubmitting = false;
+
+        renderQuiz(studentName);
+        setupTimer();
+      } catch {
+        showError(entryError, 'Server bilan aloqa uzildi.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Testni boshlash';
+      }
+    }
+
+    function updateProgress() {
+      const done = answerState.filter((a) => a.selectedOIndex !== -1).length;
+      document.getElementById('answeredProgress').textContent = `${done} / ${answerState.length} belgilandi`;
+    }
+
+    function setupTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      const timerBar = document.getElementById('timerBar');
+      const display = document.getElementById('timerDisplay');
+      timerBar.classList.remove('warning', 'danger');
+
+      if (!currentTest.timeLimit || currentTest.timeLimit <= 0) {
+        timerBar.classList.add('hidden');
+        return;
+      }
+
+      remainingSec = currentTest.timeLimit * 60;
+      const totalSec = remainingSec;
+      timerBar.classList.remove('hidden');
+      display.textContent = formatTime(remainingSec);
+      updateProgress();
+
+      timerInterval = setInterval(() => {
+        remainingSec--;
+        display.textContent = formatTime(remainingSec);
+
+        if (remainingSec <= 60) {
+          timerBar.classList.remove('warning');
+          timerBar.classList.add('danger');
+        } else if (remainingSec <= totalSec * 0.25) {
+          timerBar.classList.add('warning');
+        }
+
+        if (remainingSec <= 0) {
+          clearInterval(timerInterval);
+          submitTest(true);
+        }
+      }, 1000);
+    }
+
+    function renderQuiz(studentName) {
+      document.getElementById('entryScreen').classList.add('hidden');
+      document.getElementById('quizScreen').classList.remove('hidden');
+
+      document.getElementById('quizTitle').textContent = currentTest.title;
+      document.getElementById('quizStudent').textContent = `O‘quvchi: ${studentName} • Kod: ${currentTest.code}`;
+
+      const badges = [`${currentTest.questions.length} ta savol`];
+      if (currentTest.timeLimit > 0) badges.push(`${currentTest.timeLimit} daqiqa`);
+      if (currentTest.shuffleQuestions || currentTest.shuffleOptions) badges.push('Aralashtirilgan');
+
+      document.getElementById('quizBadges').innerHTML = badges
+        .map((b) => `<span class="badge">${escapeHtml(b)}</span>`)
+        .join('');
+
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = '';
+
+      currentTest.questions.forEach((q, displayIdx) => {
+        const block = document.createElement('div');
+        block.className = 'question-block';
+
+        const optionsHtml = q.options.map((opt, posIdx) => `
+          <button type="button" class="option-btn" data-d="${displayIdx}" data-o="${opt.oIndex}">
+            <span class="opt-letter">${letters[posIdx] || posIdx + 1}</span>
+            <span>${escapeHtml(opt.text)}</span>
+          </button>
+        `).join('');
+
+        block.innerHTML = `
+          <div class="question-title">${displayIdx + 1}. ${escapeHtml(q.text)}</div>
+          <div class="options">${optionsHtml}</div>
+        `;
+
+        container.appendChild(block);
+      });
+
+      container.querySelectorAll('.option-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const displayIdx = Number(btn.dataset.d);
+          const originalOIndex = Number(btn.dataset.o);
+          answerState[displayIdx].selectedOIndex = originalOIndex;
+
+          btn.parentElement.querySelectorAll('.option-btn').forEach((b) => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          updateProgress();
+        });
+      });
+
+      updateProgress();
+    }
+
+    document.getElementById('submitBtn').addEventListener('click', () => submitTest(false));
+
+    async function submitTest(autoSubmit = false) {
+      if (isSubmitting) return;
+      hideError(quizError);
+
+      if (!autoSubmit) {
+        const unanswered = answerState.filter((a) => a.selectedOIndex === -1).length;
+        if (unanswered > 0) {
+          const ok = confirm(`Siz ${unanswered} ta savolga javob belgilamadingiz. Baribir yakunlaysizmi?`);
+          if (!ok) return;
+        }
+      }
+
+      isSubmitting = true;
+      if (timerInterval) clearInterval(timerInterval);
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Tekshirilmoqda...';
+
+      const timeSpentSec = Math.round((Date.now() - startedAtMs) / 1000);
+
+      try {
+        const res = await fetch(`/api/tests/${currentTest.code}/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            studentName: nameInput.value.trim(),
+            answers: answerState,
+            timeSpentSec,
+            timedOut: autoSubmit
+          })
+        });
+
+        const result = await res.json();
+        if (!res.ok) {
+          isSubmitting = false;
+          showError(quizError, result.error || 'Xatolik yuz berdi');
+          return;
+        }
+
+        renderResult(result);
+      } catch {
+        isSubmitting = false;
+        showError(quizError, 'Serverga yuborishda xatolik.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Testni yakunlash';
+      }
+    }
+
+    function renderResult(result) {
+      document.getElementById('timerBar').classList.add('hidden');
+      document.getElementById('quizScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.remove('hidden');
+
+      document.getElementById('scorePercent').textContent = `${result.percent}%`;
+      document.getElementById('scoreText').textContent =
+        `${result.correctCount} / ${result.total} ta to‘g‘ri javob`;
+      document.getElementById('timeSpentText').textContent =
+        `Sarflangan vaqt: ${formatTime(result.timeSpentSec)}`;
+
+      if (result.timedOut) {
+        document.getElementById('timeoutBadge').classList.remove('hidden');
+      } else {
+        document.getElementById('timeoutBadge').classList.add('hidden');
+      }
+
+      const review = document.getElementById('reviewContainer');
+      review.innerHTML = '';
+
+      result.details.forEach((item, idx) => {
+        const block = document.createElement('div');
+        block.className = 'question-block';
+
+        const opts = item.options.map((opt, posIdx) => {
+          let cls = 'review-opt';
+          let mark = '';
+          if (opt.oIndex === item.correctOIndex) {
+            cls += ' correct';
+            mark = ' ✓ (To‘g‘ri javob)';
+          } else if (opt.oIndex === item.selectedOIndex && !item.isCorrect) {
+            cls += ' wrong';
+            mark = ' ✗ (Siz tanlagan)';
+          }
+          return `<div class="${cls}"><b>${letters[posIdx] || posIdx + 1})</b> ${escapeHtml(opt.text)}${mark}</div>`;
+        }).join('');
+
+        block.innerHTML = `
+          <div class="question-title">${idx + 1}. ${escapeHtml(item.text)}</div>
+          ${opts}
+        `;
+        review.appendChild(block);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
