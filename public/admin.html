@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel — TestPortal</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --card: #111827;
+      --card-2: #1e293b;
+      --border: #273549;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --red: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at top, #172554 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .container { max-width: 960px; margin: 0 auto; }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .brand { font-size: 20px; font-weight: 700; color: #60a5fa; }
+
+    .nav-btn {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      padding: 7px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+    }
+    .nav-btn:hover { color: var(--text); border-color: var(--accent); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .login-box { max-width: 400px; margin: 60px auto; text-align: center; }
+
+    h1, h2 { margin-bottom: 12px; }
+    .hint { color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 14px; }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 220px 180px;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 720px) {
+      .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    input:focus, textarea:focus { border-color: var(--accent); }
+
+    textarea {
+      min-height: 230px;
+      resize: vertical;
+      line-height: 1.55;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13.5px;
+    }
+
+    .code-row { display: flex; gap: 8px; }
+    .code-row input { text-align: center; font-weight: 700; letter-spacing: 3px; }
+
+    .toggles-row {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .toggle-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .toggle-card input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .btn {
+      padding: 11px 18px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn-sm { padding: 7px 12px; font-size: 13px; }
+    .btn-outline { background: var(--card-2); border: 1px solid var(--border); }
+    .btn-outline:hover { background: #273549; }
+    .btn-green { background: var(--green); }
+    .btn-green:hover { background: #059669; }
+    .btn-red { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); }
+    .btn-red:hover { background: rgba(239, 68, 68, 0.3); }
+
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+    .tab-btn {
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .hidden { display: none; }
+
+    .msg {
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-bottom: 14px;
+      display: none;
+    }
+    .msg.error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; }
+    .msg.ok { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #a7f3d0; }
+
+    .preview-item {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .preview-item.missing-answer { border-color: var(--amber); }
+    .preview-q { font-weight: 600; margin-bottom: 10px; line-height: 1.45; }
+
+    .preview-opts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 8px;
+    }
+
+    .preview-opt {
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .preview-opt:hover { border-color: var(--accent); }
+    .preview-opt.correct {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--green);
+      color: #a7f3d0;
+      font-weight: 600;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 14px;
+    }
+    th { color: var(--muted); font-weight: 600; white-space: nowrap; }
+
+    .code-pill {
+      font-family: monospace;
+      font-size: 15px;
+      font-weight: 700;
+      background: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+
+    .tag.amber {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #fcd34d;
+    }
+
+    .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div class="brand">TestPortal • Admin</div>
+      <div style="display: flex; gap: 8px;">
+        <a href="/" class="nav-btn">O‘quvchi sahifasi</a>
+        <button id="logoutBtn" class="nav-btn hidden">Chiqish</button>
+      </div>
+    </div>
+
+    <!-- KIRISH -->
+    <div id="loginScreen" class="card login-box">
+      <h2>Admin kirish</h2>
+      <p class="hint">Davom etish uchun admin parolini kiriting.</p>
+      <div id="loginMsg" class="msg error"></div>
+      <input type="password" id="passwordInput" placeholder="Parol" style="margin-bottom: 14px;" />
+      <button class="btn" style="width: 100%;" id="loginBtn">Kirish</button>
+    </div>
+
+    <!-- ASOSIY PANEL -->
+    <div id="adminPanel" class="hidden">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="createTab">+ Yangi test qo‘shish</button>
+        <button class="tab-btn" data-tab="listTab">Mavjud testlar va natijalar</button>
+      </div>
+
+      <!-- TAB 1: TEST YARATISH -->
+      <div id="createTab">
+        <div class="card">
+          <h2>Yangi test yaratish</h2>
+          <p class="hint">
+            Savollarni oddiy matn ko‘rinishida joylang — sayt ularni avtomatik ajratib oladi.
+            To‘g‘ri javobni matnda <b>*</b> bilan belgilashingiz (masalan: <code>- *B) Ctrl + A</code>)
+            yoki pastdagi ro‘yxatdan ustiga bosib tanlashingiz mumkin.
+          </p>
+
+          <div id="createMsg" class="msg"></div>
+
+          <div class="grid-3">
+            <div>
+              <label for="testTitle">Test nomi</label>
+              <input type="text" id="testTitle" placeholder="Masalan: Microsoft Word 1-dars" />
+            </div>
+            <div>
+              <label for="testCode">6 xonali test kodi</label>
+              <div class="code-row">
+                <input type="text" id="testCode" inputmode="numeric" maxlength="6" placeholder="123456" />
+                <button type="button" class="btn btn-outline btn-sm" id="randomCodeBtn" title="Tasodifiy kod">🎲</button>
+              </div>
+            </div>
+            <div>
+              <label for="timeLimit">Vaqt (daqiqa, 0 = vaqtsiz)</label>
+              <input type="number" id="timeLimit" min="0" max="300" value="0" placeholder="0" />
+            </div>
+          </div>
+
+          <div class="toggles-row">
+            <label class="toggle-card">
+              <input type="checkbox" id="shuffleQuestions" checked />
+              <span>Savollarni aralashtirish (Shuffle)</span>
+            </label>
+            <label class="toggle-card">
+              <input type="checkbox" id="shuffleOptions" checked />
+              <span>Variantlarni aralashtirish (Shuffle)</span>
+            </label>
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <label for="rawText">Test matni</label>
+            <textarea id="rawText" placeholder="Hujjatdagi barcha matnni bir vaqtning o‘zida belgilash uchun qaysi klaviatura tugmalari bosiladi?
+- A) Ctrl + C
+- *B) Ctrl + A
+- C) Ctrl + S
+- D) Ctrl + Z
+2. Ikki qator orasidagi masofani (intervalni) sozlash qaysi menyu va blok orqali amalga oshiriladi?
+- A) Вставка $\rightarrow$ Таблицы
+- *B) Главная $\rightarrow$ Абзац
+- C) Дизайн $\rightarrow$ Фон страницы
+- D) Вид $\rightarrow$ Масштаб"></textarea>
+          </div>
+
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button type="button" class="btn" id="parseBtn">Savollarni ajratib olish</button>
+            <button type="button" class="btn btn-green hidden" id="saveTestBtn">Testni saqlash</button>
+          </div>
+        </div>
+
+        <div id="previewCard" class="card hidden">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+            <h2 style="margin: 0;">Ajratilgan savollar (<span id="parsedCount">0</span> ta)</h2>
+            <span class="hint" style="margin: 0;">To‘g‘ri javobni belgilash uchun variant ustiga bosing</span>
+          </div>
+          <div id="previewList"></div>
+        </div>
+      </div>
+
+      <!-- TAB 2: TESTLAR RO'YXATI -->
+      <div id="listTab" class="hidden">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h2 style="margin: 0;">Mavjud testlar</h2>
+            <button class="btn btn-outline btn-sm" id="refreshListBtn">Yangilash</button>
+          </div>
+          <div id="testsTableWrap" class="table-wrap">Yuklanmoqda...</div>
+        </div>
+
+        <div id="resultsCard" class="card hidden">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h2 id="resultsTitle" style="margin: 0;">Natijalar</h2>
+            <button class="btn btn-outline btn-sm" onclick="document.getElementById('resultsCard').classList.add('hidden')">Yopish</button>
+          </div>
+          <div id="resultsTableWrap" class="table-wrap"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+    let adminPass = sessionStorage.getItem('adminPass') || '';
+    let parsedQuestions = [];
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatTime(totalSec) {
+      const sec = Math.max(0, Math.floor(totalSec || 0));
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function showMsg(el, text, type = 'error') {
+      el.textContent = text;
+      el.className = `msg ${type}`;
+      el.style.display = 'block';
+    }
+
+    if (adminPass) {
+      verifyAndOpen(adminPass);
+    }
+
+    async function verifyAndOpen(pass) {
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pass })
+        });
+        if (res.ok) {
+          adminPass = pass;
+          sessionStorage.setItem('adminPass', pass);
+          document.getElementById('loginScreen').classList.add('hidden');
+          document.getElementById('adminPanel').classList.remove('hidden');
+          document.getElementById('logoutBtn').classList.remove('hidden');
+          loadTests();
+        } else {
+          sessionStorage.removeItem('adminPass');
+          showMsg(document.getElementById('loginMsg'), "Parol noto'g'ri");
+        }
+      } catch {
+        showMsg(document.getElementById('loginMsg'), 'Serverga ulanib bo‘lmadi');
+      }
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', () => {
+      verifyAndOpen(document.getElementById('passwordInput').value);
+    });
+
+    document.getElementById('passwordInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') verifyAndOpen(e.target.value);
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.removeItem('adminPass');
+      location.reload();
+    });
+
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('createTab').classList.add('hidden');
+        document.getElementById('listTab').classList.add('hidden');
+        document.getElementById(btn.dataset.tab).classList.remove('hidden');
+        if (btn.dataset.tab === 'listTab') loadTests();
+      });
+    });
+
+    const testCodeInput = document.getElementById('testCode');
+    testCodeInput.addEventListener('input', () => {
+      testCodeInput.value = testCodeInput.value.replace(/\D/g, '').slice(0, 6);
+    });
+
+    document.getElementById('randomCodeBtn').addEventListener('click', () => {
+      testCodeInput.value = String(Math.floor(100000 + Math.random() * 900000));
+    });
+
+    function parseRawText(raw) {
+      const lines = raw
+        .replace(/\r/g, '')
+        .replace(/\$\\rightarrow\$/g, '→')
+        .replace(/\\rightarrow/g, '→')
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0);
+
+      const questions = [];
+      let current = null;
+
+      for (const line of lines) {
+        const ansMatch = line.match(/^(?:javob|to['‘’`]?g['‘’`]?ri\s+javob|answer)\s*[:\-–]?\s*([A-Fa-f])\b/i);
+        if (ansMatch && current) {
+          const idx = ansMatch[1].toUpperCase().charCodeAt(0) - 65;
+          if (idx >= 0 && idx < current.options.length) {
+            current.correctIndex = idx;
+          }
+          continue;
+        }
+
+        const optMatch = line.match(/^([+*])?\s*(?:[-•–—]\s*)?([+*])?\s*([A-Fa-f])[\)\.\:]\s*(.+)$/);
+        if (optMatch) {
+          if (!current) continue;
+          let isCorrect = Boolean(optMatch[1] || optMatch[2]);
+          let optText = optMatch[4].trim();
+
+          if (/\s*(\*|\(\+\)|\[\+\]|\(to['‘’`]?g['‘’`]?ri\))$/i.test(optText)) {
+            isCorrect = true;
+            optText = optText.replace(/\s*(\*|\(\+\)|\[\+\]|\(to['‘’`]?g['‘’`]?ri\))$/i, '').trim();
+          }
+
+          current.options.push(optText);
+          if (isCorrect) {
+            current.correctIndex = current.options.length - 1;
+          }
+          continue;
+        }
+
+        const cleanQuestion = line.replace(/^\d+[\.\)]\s*/, '').trim();
+        if (current && current.options.length > 0) {
+          questions.push(current);
+          current = { text: cleanQuestion, options: [], correctIndex: -1 };
+        } else if (current && current.options.length === 0) {
+          current.text += ' ' + cleanQuestion;
+        } else {
+          current = { text: cleanQuestion, options: [], correctIndex: -1 };
+        }
+      }
+
+      if (current && current.options.length > 0) {
+        questions.push(current);
+      }
+
+      return questions;
+    }
+
+    function renderPreview() {
+      const card = document.getElementById('previewCard');
+      const list = document.getElementById('previewList');
+      const saveBtn = document.getElementById('saveTestBtn');
+
+      if (parsedQuestions.length === 0) {
+        card.classList.add('hidden');
+        saveBtn.classList.add('hidden');
+        return;
+      }
+
+      card.classList.remove('hidden');
+      saveBtn.classList.remove('hidden');
+      document.getElementById('parsedCount').textContent = parsedQuestions.length;
+
+      list.innerHTML = '';
+      parsedQuestions.forEach((q, qIdx) => {
+        const div = document.createElement('div');
+        div.className = 'preview-item' + (q.correctIndex === -1 ? ' missing-answer' : '');
+
+        const optsHtml = q.options.map((opt, oIdx) => `
+          <button type="button" class="preview-opt ${q.correctIndex === oIdx ? 'correct' : ''}"
+            data-q="${qIdx}" data-o="${oIdx}">
+            <b>${letters[oIdx] || oIdx + 1})</b> ${escapeHtml(opt)}
+            ${q.correctIndex === oIdx ? ' ✓' : ''}
+          </button>
+        `).join('');
+
+        div.innerHTML = `
+          <div class="preview-q">${qIdx + 1}. ${escapeHtml(q.text)}</div>
+          <div class="preview-opts">${optsHtml}</div>
+        `;
+        list.appendChild(div);
+      });
+
+      list.querySelectorAll('.preview-opt').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const qIdx = Number(btn.dataset.q);
+          const oIdx = Number(btn.dataset.o);
+          parsedQuestions[qIdx].correctIndex = oIdx;
+          renderPreview();
+        });
+      });
+    }
+
+    document.getElementById('parseBtn').addEventListener('click', () => {
+      const msg = document.getElementById('createMsg');
+      msg.style.display = 'none';
+
+      const raw = document.getElementById('rawText').value;
+      parsedQuestions = parseRawText(raw);
+
+      if (parsedQuestions.length === 0) {
+        showMsg(msg, 'Savollar topilmadi. Formatni tekshiring (masalan: - A) Variant).', 'error');
+        renderPreview();
+        return;
+      }
+
+      renderPreview();
+      document.getElementById('previewCard').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    document.getElementById('saveTestBtn').addEventListener('click', async () => {
+      const msg = document.getElementById('createMsg');
+      msg.style.display = 'none';
+
+      const title = document.getElementById('testTitle').value.trim();
+      const code = testCodeInput.value.trim();
+      const timeLimit = Number(document.getElementById('timeLimit').value) || 0;
+      const shuffleQuestions = document.getElementById('shuffleQuestions').checked;
+      const shuffleOptions = document.getElementById('shuffleOptions').checked;
+
+      if (!title) return showMsg(msg, 'Test nomini kiriting.');
+      if (!/^\d{6}$/.test(code)) return showMsg(msg, 'Test kodi aniq 6 xonali son bo‘lishi kerak.');
+
+      const missingIdx = parsedQuestions.findIndex((q) => q.correctIndex === -1);
+      if (missingIdx !== -1) {
+        return showMsg(msg, `${missingIdx + 1}-savolning to‘g‘ri javobini pastdan tanlang.`);
+      }
+
+      try {
+        const res = await fetch('/api/admin/tests', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-admin-password': adminPass
+          },
+          body: JSON.stringify({
+            code,
+            title,
+            timeLimit,
+            shuffleQuestions,
+            shuffleOptions,
+            questions: parsedQuestions
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) return showMsg(msg, data.error || 'Saqlashda xatolik');
+
+        showMsg(msg, `Test MongoDB ga muvaffaqiyatli saqlandi! Kod: ${code}`, 'ok');
+        document.getElementById('testTitle').value = '';
+        testCodeInput.value = '';
+        document.getElementById('timeLimit').value = '0';
+        document.getElementById('rawText').value = '';
+        parsedQuestions = [];
+        renderPreview();
+      } catch {
+        showMsg(msg, 'Server bilan aloqa xatoligi.');
+      }
+    });
+
+    async function loadTests() {
+      const wrap = document.getElementById('testsTableWrap');
+      wrap.textContent = 'Yuklanmoqda...';
+
+      try {
+        const res = await fetch('/api/admin/tests', {
+          headers: { 'x-admin-password': adminPass }
+        });
+        const tests = await res.json();
+
+        if (!tests.length) {
+          wrap.innerHTML = '<p class="hint">Hozircha birorta ham test qo‘shilmagan.</p>';
+          return;
+        }
+
+        const rows = tests.map((t) => {
+          const settings = [];
+          settings.push(t.timeLimit > 0 ? `⏱ ${t.timeLimit} daq` : 'Vaqtsiz');
+          if (t.shuffleQuestions) settings.push('🔀 Savollar');
+          if (t.shuffleOptions) settings.push('🔀 Variantlar');
+
+          return `
+            <tr>
+              <td><span class="code-pill">${escapeHtml(t.code)}</span></td>
+              <td><b>${escapeHtml(t.title)}</b></td>
+              <td>${t.questionCount} ta</td>
+              <td>${settings.map((s) => `<span class="tag">${s}</span>`).join('')}</td>
+              <td>${t.resultsCount} kishi</td>
+              <td class="actions">
+                <button class="btn btn-outline btn-sm" onclick="copyLink('${t.code}')">Havola</button>
+                <button class="btn btn-sm" onclick="viewResults('${t.code}')">Natijalar</button>
+                <button class="btn btn-red btn-sm" onclick="deleteTest('${t.code}')">O‘chirish</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        wrap.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Kod</th>
+                <th>Test nomi</th>
+                <th>Savollar</th>
+                <th>Sozlamalar</th>
+                <th>Ishlaganlar</th>
+                <th>Amallar</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        `;
+      } catch {
+        wrap.textContent = 'Yuklashda xatolik yuz berdi.';
+      }
+    }
+
+    document.getElementById('refreshListBtn').addEventListener('click', loadTests);
+
+    window.copyLink = (code) => {
+      const url = `${location.origin}/?code=${code}`;
+      navigator.clipboard.writeText(url);
+      alert(`Havola nusxalandi:\n${url}`);
+    };
+
+    window.viewResults = async (code) => {
+      const card = document.getElementById('resultsCard');
+      const wrap = document.getElementById('resultsTableWrap');
+      card.classList.remove('hidden');
+      wrap.textContent = 'Yuklanmoqda...';
+
+      const res = await fetch(`/api/admin/results/${code}`, {
+        headers: { 'x-admin-password': adminPass }
+      });
+      const data = await res.json();
+      document.getElementById('resultsTitle').textContent = `${data.title} (${data.code}) — Natijalar`;
+
+      if (!data.results.length) {
+        wrap.innerHTML = '<p class="hint">Hali hech kim bu testni ishlamagan.</p>';
+        return;
+      }
+
+      const rows = data.results.map((r, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td><b>${escapeHtml(r.studentName)}</b></td>
+          <td>${r.correctCount} / ${r.total}</td>
+          <td><b>${r.percent}%</b></td>
+          <td>
+            ${formatTime(r.timeSpentSec)}
+            ${r.timedOut ? '<span class="tag amber">Vaqt tugagan</span>' : ''}
+          </td>
+          <td style="color: var(--muted);">${new Date(r.submittedAt).toLocaleString('uz-UZ')}</td>
+        </tr>
+      `).join('');
+
+      wrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>O‘quvchi</th>
+              <th>To‘g‘ri</th>
+              <th>Foiz</th>
+              <th>Sarflagan vaqti</th>
+              <th>Sana</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+      card.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.deleteTest = async (code) => {
+      if (!confirm(`${code} kodli test va barcha natijalarini o‘chirishni tasdiqlaysizmi?`)) return;
+      await fetch(`/api/admin/tests/${code}`, {
+        method: 'DELETE',
+        headers: { 'x-admin-password': adminPass }
+      });
+      loadTests();
+    };
+  </script>
+</body>
+</html>
