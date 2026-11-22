@@ -1,0 +1,17 @@
+{
+  "name": "online-test-platform",
+  "version": "2.0.0",
+  "description": "MongoDB, taymer va shuffle qo'llab-quvvatlovchi onlayn test platformasi",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.7.0"
+  }
+}
